@@ -14,7 +14,7 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
 
-    <!-- ENCABEZADO CORPORATIVO ESTANDARIZADO (IDÉNTICO A MC-06.01) -->
+    <!-- ENCABEZADO CORPORATIVO ESTANDARIZADO -->
     <header class="bg-[#0f172a] text-white sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4">
@@ -39,12 +39,12 @@
             </div>
         </div>
 
-        <!-- FILA DE 4 TARJETA SUB-INDICADORES (ESTILO MC-06.01) -->
+        <!-- FILA DE 4 TARJETAS SUB-INDICADORES ENERGÍZADAS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <!-- Tarjeta 1: Meta -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 border-l-4 border-l-slate-400 shadow-sm flex flex-col justify-between h-32">
+            <!-- Tarjeta 1: Meta (Amarillo de Amistad Brilloso) -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 border-l-4 border-l-amber-400 shadow-sm flex flex-col justify-between h-32">
                 <div>
-                    <span class="text-xs font-bold uppercase text-slate-500 tracking-wider block">MATERIAL DISTRIBUIDO</span>
+                    <span class="text-xs font-bold uppercase text-amber-500 tracking-wider block">MATERIAL DISTRIBUIDO</span>
                     <span id="card-total-distribuido" class="text-3xl font-extrabold text-slate-800 mt-1 block">...</span>
                 </div>
                 <p class="text-[11px] text-slate-400 leading-tight">Volumen total de recursos pedagógicos despachados a las IIEE.</p>
@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <!-- REPORTE AGREGADO TABULAR (REQUERIMIENTO PRINCIPAL) -->
+        <!-- REPORTE AGREGADO TABULAR DETALLADO -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden space-y-4 p-6">
             <div>
                 <h3 class="text-sm font-bold uppercase text-slate-700 tracking-wider">Reporte Agregado de Suficiencia Logística</h3>
@@ -105,7 +105,7 @@
         &copy; 2026 Coordinación Territorial FED - Huancavelica. Monitoreo Logístico de Materiales Educativos EIB y Rural.
     </footer>
 
-    <!-- LÓGICA E INTEGRACIÓN CON LA CEREZA DEL APPS SCRIPT -->
+    <!-- LÓGICA CORE CON AMARILLO INYECTADO -->
     <script>
         Chart.register(ChartDataLabels);
 
@@ -121,7 +121,6 @@
                 const filaTotal = datos.find(d => d.entidad.toUpperCase() === "TOTAL REGIONAL");
                 const datosUgels = datos.filter(d => d.entidad.toUpperCase() !== "TOTAL REGIONAL");
 
-                // 1. POBLAR TARJETAS SUPERIORES
                 if (filaTotal) {
                     document.getElementById("card-total-distribuido").innerText = Number(filaTotal.distribuido).toLocaleString();
                     document.getElementById("card-total-pendiente").innerText = Number(filaTotal.pendiente).toLocaleString();
@@ -129,16 +128,12 @@
                     document.getElementById("txt-porc-hvc").innerText = `${(filaTotal.porcentaje * 100).toFixed(2)}%`;
                 }
 
-                // 2. POBLAR TABLA DE DATOS (ESTILO REPORTE CONTRACTUAL)
                 const tablaCuerpo = document.getElementById("tabla-cuerpo");
                 tablaCuerpo.innerHTML = "";
 
-                // Renderizar UGELs primero
                 datosUgels.forEach(u => insertarFilaTabla(u, tablaCuerpo, false));
-                // Renderizar Fila Total al final de manera destacada
                 if (filaTotal) insertarFilaTabla(filaTotal, tablaCuerpo, true);
 
-                // 3. GENERAR GRÁFICO CON COLORES IDÉNTICOS A MC-06.01
                 const labels = datosUgels.map(u => u.entidad.replace("UGEL ", ""));
                 const datasetMeta = datosUgels.map(u => u.distribuido);
                 const datasetPendiente = datosUgels.map(u => u.pendiente);
@@ -150,9 +145,9 @@
                     data: {
                         labels: labels,
                         datasets: [
-                            { label: 'Meta Total', data: datasetMeta, backgroundColor: '#64748b', borderRadius: 4 }, // Gris
-                            { label: 'Pendiente', data: datasetPendiente, backgroundColor: '#ef4444', borderRadius: 4 }, // Rojo
-                            { label: 'Con Conformidad', data: datasetConformidad, backgroundColor: '#2563eb', borderRadius: 4 } // Azul
+                            { label: 'Meta Total', data: datasetMeta, backgroundColor: '#f59e0b', borderRadius: 4 }, // Amarillo/Amber Brilloso de Vida
+                            { label: 'Pendiente', data: datasetPendiente, backgroundColor: '#ef4444', borderRadius: 4 }, // Rojo Alerta
+                            { label: 'Con Conformidad', data: datasetConformidad, backgroundColor: '#2563eb', borderRadius: 4 } // Azul Fuerza
                         ]
                     },
                     options: {
