@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FED Huancavelica - Indicador MC-05.01</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- ENCABEZADO CORPORATIVO FED 2.0 -->
+    <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-50 shadow-xl">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <span class="bg-red-600 text-white text-xs font-black tracking-widest uppercase px-3 py-1 rounded-md shadow-md">FED 2.0</span>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight text-white">Huancavelica: Control de Distribución de Material Educativo</h1>
+                    <p class="text-xs text-slate-400 mt-0.5">Monitoreo Territorial de Ámbitos EIB y Rural - SIGA Logístico</p>
+                </div>
+            </div>
+            <div class="bg-indigo-600/20 border border-indigo-500/40 text-indigo-400 font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider">
+                Indicador MC-05.01: Suministro Pertinente y Suficiente[cite: 1]
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto px-6 py-8 space-y-8 flex-grow">
+        
+        <!-- SECCIÓN DE COBERTURA REGIONAL CONSOLIDADA -->
+        <div class="bg-gradient-to-r from-indigo-950 via-slate-950 to-indigo-950 p-6 rounded-3xl border border-indigo-500/30 shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+            <div>
+                <h2 class="text-lg font-bold text-white uppercase tracking-tight">Estado Situacional del Indicador</h2>
+                <p class="text-xs text-indigo-300 mt-1">Porcentaje acumulado de asignación conforme frente a la meta técnica de negociación (70.8%)[cite: 1].</p>
+            </div>
+            <div class="flex items-center gap-3 bg-slate-900/80 px-5 py-3 rounded-2xl border border-slate-800">
+                <div class="text-right">
+                    <span class="text-[10px] text-slate-400 block font-bold uppercase">Avance Regional</span>
+                    <span id="txt-porc-hvc" class="text-2xl font-black text-emerald-400">...</span>
+                </div>
+                <div id="status-hvc-badge" class="h-3 w-3 rounded-full bg-slate-600"></div>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR DEL GRÁFICO PRINCIPAL DE COLUMNAS SEPARADAS -->
+        <div class="bg-slate-950 p-6 rounded-3xl border border-slate-800 shadow-xl space-y-6">
+            <div>
+                <h3 class="text-sm font-black uppercase text-slate-400 tracking-wider">Balance de Carga Física: Material Distribuido vs Registro de Conformidad[cite: 2]</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Comparativo agrupado por Unidad Ejecutora basado en reportes de PECOSA verificados[cite: 1, 2].</p>
+            </div>
+            <div class="relative w-full h-[360px]">
+                <canvas id="chartEIB"></canvas>
+            </div>
+
+            <!-- FILA DE 4 GRANDES TARJETAS DE EXPLICACIÓN DE LEYENDAS -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t border-slate-800/80">
+                <!-- Tarjeta 1 -->
+                <div class="p-4 rounded-xl border-l-4 border-blue-500 bg-blue-950/20">
+                    <div class="text-[10px] font-black text-blue-400 uppercase tracking-wider">Material Distribuido</div>
+                    <div id="card-total-distribuido" class="text-2xl font-black text-white mt-0.5">...</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Volumen total de recursos pedagógicos despachados a las IIEE[cite: 1, 2].</div>
+                </div>
+                <!-- Tarjeta 2 -->
+                <div class="p-4 rounded-xl border-l-4 border-emerald-500 bg-emerald-950/20">
+                    <div class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">Con Conformidad</div>
+                    <div id="card-total-conformidad" class="text-2xl font-black text-emerald-400 mt-0.5">...</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Ítems con recepción validada y registrada en MC SIGA[cite: 1, 2].</div>
+                </div>
+                <!-- Tarjeta 3 -->
+                <div class="p-4 rounded-xl border-l-4 border-red-500 bg-red-950/20">
+                    <div class="text-[10px] font-black text-red-400 uppercase tracking-wider">Pendiente de Conformidad</div>
+                    <div id="card-total-pendiente" class="text-2xl font-black text-red-400 mt-0.5">...</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Brecha física de materiales en alerta de regularización[cite: 2].</div>
+                </div>
+                <!-- Tarjeta 4 -->
+                <div class="p-4 rounded-xl border-l-4 border-amber-500 bg-amber-950/20">
+                    <div class="text-[10px] font-black text-amber-400 uppercase tracking-wider">Evaluación FED Regional</div>
+                    <div id="card-total-evaluacion" class="text-xs font-black text-white mt-2.5 uppercase tracking-wide">Cargando...</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Condición analítica frente a las metas de desempeño[cite: 1].</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-950 text-slate-500 text-center py-6 border-t border-slate-800 text-xs">
+        &copy; 2026 Coordinación Territorial FED - Huancavelica. Monitoreo Logístico de Materiales Educativos EIB y Rural[cite: 1].
+    </footer>
+
+    <!-- INTERCONEXIÓN ASÍNCRONA CON GOOGLE SHEETS -->
+    <script>
+        // Registrar el plugin de etiquetas sobre las barras
+        Chart.register(ChartDataLabels);
+
+        // PEGA AQUÍ TU NUEVA URL GENERADA POR EL APPS SCRIPT
+        const URL_API = "PEGA_AQUI_TU_NUEVA_URL_DE_APPS_SCRIPT"; 
+
+        async function cargarDashboard() {
+            try {
+                const respuesta = await fetch(URL_API);
+                const datos = await respuesta.json();
+                
+                // Separamos la fila del TOTAL REGIONAL de las UGEL individuales
+                const filaTotal = datos.find(d => d.entidad.toUpperCase() === "TOTAL REGIONAL");
+                const datosUgels = datos.filter(d => d.entidad.toUpperCase() !== "TOTAL REGIONAL");
+
+                if (filaTotal) {
+                    const porcHvc = (filaTotal.porcentaje * 100).toFixed(2);
+                    document.getElementById("txt-porc-hvc").innerText = `${porcHvc}%`;
+                    
+                    // Indicador luminoso de estado
+                    const badge = document.getElementById("status-hvc-badge");
+                    badge.className = filaTotal.porcentaje >= 0.708 ? "h-3 w-3 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500" : "h-3 w-3 rounded-full bg-red-500 shadow-lg shadow-red-500 animate-pulse";
+
+                    // Poblamos las 4 grandes tarjetas informativas inferiores
+                    document.getElementById("card-total-distribuido").innerText = Number(filaTotal.distribuido).toLocaleString();
+                    document.getElementById("card-total-conformidad").innerText = Number(filaTotal.conformidad).toLocaleString();
+                    document.getElementById("card-total-pendiente").innerText = Number(filaTotal.pendiente).toLocaleString();
+                    
+                    const lblEval = document.getElementById("card-total-evaluacion");
+                    lblEval.innerText = filaTotal.evaluacion;
+                    lblEval.className = filaTotal.evaluacion.includes("OPTIMO") ? "text-xs font-black text-emerald-400 mt-2.5 uppercase tracking-wide" : "text-xs font-black text-red-400 mt-2.5 uppercase tracking-wide animate-pulse";
+                }
+
+                // Ejes y vectores para la gráfica de Chart.js
+                const labels = datosUgels.map(u => u.entidad.replace("UGEL ", ""));
+                const datasetDistribuido = datosUgels.map(u => u.distribuido);
+                const datasetConformidad = datosUgels.map(u => u.conformidad);
+
+                const ctx = document.getElementById('chartEIB').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Total Distribuido',
+                                data: datasetDistribuido,
+                                backgroundColor: '#2563EB', // Azul Eléctrico
+                                borderRadius: 5
+                            },
+                            {
+                                label: 'Total con Conformidad',
+                                data: datasetConformidad,
+                                backgroundColor: '#10B981', // Verde Esmeralda Brillante
+                                borderRadius: 5
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { weight: '600', size: 11 } } },
+                            y: { beginAtZero: true, grid: { color: '#1E293B' }, ticks: { color: '#94A3B8' } }
+                        },
+                        plugins: {
+                            legend: { display: false }, // Apagamos la leyenda superior porque usamos las tarjetas explicativas abajo
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 2,
+                                font: { size: 9, weight: 'bold', family: "'Inter', sans-serif" },
+                                color: '#FFFFFF',
+                                formatter: value => value > 0 ? value.toLocaleString() : ''
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error en la sincronización de datos del FED: ", error);
+            }
+        }
+
+        window.onload = cargarDashboard;
+    </script>
+</body>
+</html>
